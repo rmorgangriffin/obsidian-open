@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Open in Obsidian</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 32px 20px; text-align: center; background: #f6f4ef; color: #222; }
+  @media (prefers-color-scheme: dark) { body { background: #1c1b19; color: #eee; } }
+  a.btn, button { display: inline-block; margin: 8px 6px; padding: 12px 20px; border-radius: 10px; border: 0; font: inherit; background: #6c4fd1; color: #fff; text-decoration: none; }
+  button.quiet { background: transparent; color: inherit; border: 1px solid currentColor; }
+  p.small { opacity: .7; font-size: 14px; }
+</style>
+</head>
+<body>
+<p id="msg">Opening Obsidian…</p>
+<p><a class="btn" id="open" href="#">Open in Obsidian</a><button class="quiet" id="copy" type="button">Copy note name</button></p>
+<p class="small">This page holds no notes. The note name travels after the # in the link, which never reaches the server.</p>
+<script>
+  // Relay for Work and Life (Morgan's planners): claude.ai's page frame won't hand obsidian:// links to the app on iPhone,
+  // but a normal page in its own Safari tab can. Link form: .../#v=<vault>&f=<note name>, both URL-encoded.
+  var p = new URLSearchParams(location.hash.slice(1));
+  var vault = p.get("v") || "The Shambles", file = p.get("f") || "";
+  var target = "obsidian://open?vault=" + encodeURIComponent(vault) + (file ? "&file=" + encodeURIComponent(file) : "");
+  document.getElementById("open").href = target;
+  document.getElementById("copy").onclick = function () {
+    var name = file.split("/").pop();
+    (navigator.clipboard ? navigator.clipboard.writeText(name) : Promise.reject()).then(
+      function () { document.getElementById("msg").textContent = "Copied “" + name + "”. Open Obsidian, tap search, and paste."; },
+      function () { document.getElementById("msg").textContent = "Search Obsidian for “" + name + "”."; });
+  };
+  if (file) { location.href = target; } else { document.getElementById("msg").textContent = "No note was named in this link."; }
+</script>
+</body>
+</html>
